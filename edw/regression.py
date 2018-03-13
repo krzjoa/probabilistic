@@ -27,7 +27,7 @@ from edward.models import Normal
 
 
 # Model
-X = tf.placeholder(tf.float32, [N, D])
+X = tf.placeholder(tf.float32, [None, D])
 
 w = Normal(loc=tf.zeros(D), scale=tf.ones(D))
 b = Normal(loc=tf.zeros(1), scale=tf.ones(1))
