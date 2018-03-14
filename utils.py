@@ -1,19 +1,36 @@
 from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 import numpy as np
 import matplotlib.pyplot as plt
 
-def get_data(fetch_data, test_size=.25, features=0):
+def get_data(fetch_data, test_size=.25):
     '''
 
     Simple utility to fetch data
 
-    :param fetch_data:
-    :param test_size:
-    :return:
+    Parameters
+    ----------
+    fetch_data: callable
+        A function for fetching data
+    test_size: float
+        Test set size
+
+    Returns
+    -------
+    X_train: numpy.ndarray
+       Train set features
+    X_test: numpy.ndarray
+       Test set features
+    y_train: numpy.ndarray
+       Train set targets
+    y_test: numpy.ndarray
+       Test set targets
+
     '''
     bunch = fetch_data()
-    X = bunch.data#[:, features].reshape(-1, 1)
+    X = bunch.data
     y = bunch.target
+    X, y = shuffle(X, y)
     return train_test_split(X, y, test_size=test_size)
 
 

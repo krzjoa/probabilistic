@@ -1,4 +1,11 @@
 # Bayesian regresion on real dataset
+# California Housing
+
+
+# MSE
+# LinearRegression: 0.54
+# Lasso: 0.98
+# Bayesian Linear Regression (n_samples=500, n_iter=200 / MSE n_samples=500): 26.246012
 
 import sys
 sys.path.append("..")
@@ -13,7 +20,6 @@ X_train, X_test, y_train, y_test = get_data(fetch_california_housing)
 # Data size
 N, D  = X_train.shape
 Nt, _ = X_test.shape
-
 
 # Conventional linear model
 from sklearn.linear_model import LinearRegression
@@ -43,6 +49,7 @@ x = tf.placeholder(tf.float32, [None, D])
 w = Normal(loc=tf.zeros(D), scale=tf.ones(D))
 b = Normal(loc=tf.zeros(1), scale=tf.ones(1))
 y = Normal(loc=ed.dot(x, w) + b, scale=tf.ones(N))
+
 yt = Normal(loc=ed.dot(x, w) + b, scale=tf.ones(Nt))
 
 qw = Normal(loc=tf.get_variable("qw.loc", [D]),
@@ -51,14 +58,28 @@ qb = Normal(loc=tf.get_variable("qb.loc", [1]),
             scale=tf.nn.softplus(tf.get_variable("qb.scale", [1])))
 
 inference = ed.KLqp({w: qw, b: qb}, data={x: X_train, y: y_train})
-inference.run(n_samples=2000, n_iter=1000)
+inference.run(n_samples=500, n_iter=200)
 
 y_post = ed.copy(yt, {w: qw, b: qb})
 print("Mean squared error on test data:")
 # print(ed.evaluate('mean_squared_error', data={x: X_test, y_post: y_test}, n_samples=1000))
 # print(ed.evaluate('mean_squared_error', data={x: X_test, y_post: y_test}))
-print(ed.evaluate('mean_squared_error', data={x: X_test, y_post: y_test}, n_samples=10))
+print(ed.evaluate('mean_squared_error', data={x: X_test, y_post: y_test}))
 
 print("Mean absolute error on test data:")
 print(ed.evaluate('mean_absolute_error', data={x: X_test, y_post: y_test}))
+
+# Predictions
+with tf.Session() as sess:
+    y_pred = sess.run(yt, feed_dict={x: X_test})
+
+print y_pred
+print y_pred.shape
+print y_pred.sum()
+
+#import pdb
+#pdb.set_trace()
+
+
+
 
