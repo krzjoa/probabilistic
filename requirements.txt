@@ -1,1 +1,0 @@
-git+https://github.com/blei-lab/edward.git#egg=edward
